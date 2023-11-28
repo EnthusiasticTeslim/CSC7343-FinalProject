@@ -1,0 +1,27 @@
+# Jupyter Notebook
+.ipynb_checkpoints
+Untitled-1*
+
+# IPython
+profile_default/
+ipython_config.py
+
+#pyc
+*.pyc
+
+# pyenv
+.python-version
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+*.DS_Store
+
+# model
+*bin
+*pt
+*pth
