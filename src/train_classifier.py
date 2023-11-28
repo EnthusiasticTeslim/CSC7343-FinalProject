@@ -2,51 +2,56 @@ import logging
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset, Dataset
+from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 
-from .model import BERT_CONFIG, FocalLoss, TCRModel
+from .model import BERT_CONFIG, FocalLoss, TCRModel # model, loss function
+from .dataPreprocessing import ProteinDataset # dataset preprocessor
 
-class ProteinDataset(Dataset):
-    def __init__(self, df, tokenizer, max_len):
-        self.df = df
-        self.tokenizer = tokenizer
-        self.max_len = max_len
+# """
+#     package versions:
+#         torch: 2.1.1+cu121
+#         transformers: 4.35.2
+#         sklearn: 1.3.0
+#         logging: 0.5.1.2
+# """
 
 
+# key reference: https://github.com/aws-samples/amazon-sagemaker-protein-classification/blob/main/code/train.py
 class ModelTrainer(nn.Module):
 
     """
-     package versions:
-     torch: 2.1.1+cu121
-     transformers: 4.35.2
-     sklearn: 1.3.0
-     logging: 0.5.1.2"""
+        ************** Train/Test the model using cross validation ************** 
+        seed: seed for random number generator
+        epochs: number of epochs to train
+        lr: learning rate
+        train: flag whether to train the model
+        log_interval: how many batches to wait before logging training status
+        model: takes input_ids: str, attention_mask: str, classification: bool
+        
+    """
 
     def __init__(self, args, train=True, seed = 2023, lr=2e-5, epochs=1000, log_interval=10):
         
-        self.seed = seed # seed for random number generator
-        self.epochs = epochs # number of epochs to train
-        self.log_interval = log_interval # how many batches to wait before logging training status
+        self.seed = seed 
+        self.epochs = epochs 
+        self.log_interval = log_interval 
         self.device = torch.device("cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
-        self.model = TCRModel.to(self.device) # takes input_ids, attention_mask, classification
+        self.model = TCRModel.to(self.device) 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=args.lr)
 
     def train(self, train_loader, fold = 5, batch_size = 32):
         '''Train the network on the training set using cross validation.'''
         
-        # set the seed for generating random numbers
-        torch.manual_seed(args.seed)
+        
+        torch.manual_seed(args.seed) # set the seed for generating random numbers
 
         if torch.cuda.is_available():
             torch.cuda.manual_seed(args.seed)
         
-         # split data for K-fold cross validation to avoid overfitting
+        # split data for K-fold cross validation to avoid overfitting
         indices = list(range(len(train_loader.dataset)))
         kf = KFold(n_splits=fold, shuffle=True)
         cv_index = 0
@@ -72,11 +77,11 @@ class ModelTrainer(nn.Module):
 
                 self.model.train()
                 
-                for step, batch in enumerate(train_loader):
+                for step, data in enumerate(train_loader):
 
-                    input_ids = batch['input_ids'].to(device)
-                    input_mask = batch['attention_mask'].to(device)
-                    labels = batch['targets'].to(device)
+                    input_ids = data['input_ids'].to(device)
+                    input_mask = data['attention_mask'].to(device)
+                    labels = data['interaction'].to(device)
 
                     outputs = self.model(
                                         input_ids = input_ids  # amino acid index numbers
@@ -96,7 +101,7 @@ class ModelTrainer(nn.Module):
                                 cv_index, epoch, step * len(batch['input_ids'])*world_size,
                                 len(train_loader.dataset), 100.0 * step / len(train_loader), loss))
 
-                # error after every epoch
+                # train & validation error after every epoch
                 train_loss_avg = np.mean(epoch_train_loss)
                 val_loss_avg = self.validate(val_loader=val_loader, model=self.model, loss_func=clf_loss_func)
 
@@ -110,11 +115,13 @@ class ModelTrainer(nn.Module):
             model.eval()
             with torch.set_grad_enabled(False):
 
-                for (feature, label) in val_loader:
-                    label = convert_labels(label) # convert labels to one-hot encoding
-                    feature, label = feature.to(self.device).long(), label.to(self.device)
+                for step, data in enumerate(val_loader):
 
-                    outputs = model(feature)
+                    input_ids = data['input_ids'].to(self.device)
+                    input_mask = data['attention_mask'].to(self.device)
+                    labels = data['targets'].to(self.device)
+
+                    outputs = model(input=input_ids, attention_mask=input_mask, classification=True)
 
                     loss = loss_func(input=outputs, target=labels)
                     loss_accum.append(loss)
@@ -130,11 +137,11 @@ class ModelTrainer(nn.Module):
             correct_predictions = 0
             
             with torch.no_grad():
-                for batch in test_loader:
+                for data in test_loader:
                     
-                    input_ids = batch['input_ids'].to(self.device)
-                    input_mask = batch['attention_mask'].to(self.device)
-                    labels = batch['targets'].to(self.device)
+                    input_ids = data['input_ids'].to(self.device)
+                    input_mask = data['attention_mask'].to(self.device)
+                    labels = data['targets'].to(self.device)
 
                     outputs = self.model(input=input_ids, attention_mask=input_mask, classification=True)
                     
