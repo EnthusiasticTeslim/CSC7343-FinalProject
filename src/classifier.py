@@ -7,8 +7,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from sklearn.model_selection import KFold
 
-from .model import BERT_CONFIG, FocalLoss, TCRModel # model, loss function
-from .dataPreprocessing import ProteinDataset # dataset preprocessor
+from model import BERT_CONFIG, FocalLoss, TCRModel # model, loss function
 
 # """
 #     package versions:
@@ -79,15 +78,12 @@ class ModelTrainer(nn.Module):
                 
                 for step, data in enumerate(train_loader):
 
-                    input_ids = data['input_ids'].to(device)
-                    input_mask = data['attention_mask'].to(device)
-                    labels = data['interaction'].to(device)
+                    input_ids = data['input_ids'].to(device)   # amino acid index numbers
+                    input_mask = data['attention_mask'].to(device) # attention mask (1 for non-padding token and 0 for padding)
+                    labels = data['interaction'].to(device) # True for classification task
 
                     outputs = self.model(
-                                        input_ids = input_ids  # amino acid index numbers
-                                        attention_mask = input_mask, # attention mask (1 for non-padding token and 0 for padding)
-                                        classification = True # True for classification task
-                                        )
+                                        input_ids = input_ids, attention_mask = input_mask, classification = True)
                     self.model.to(self.device)
                     loss = clf_loss_func(input=outputs, target=labels)
                     epoch_train_loss.append(loss)
