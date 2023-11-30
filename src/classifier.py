@@ -18,7 +18,9 @@ from model import BERT_CONFIG, FocalLoss, TCRModel # model, loss function
 # """
 
 
-# key reference: https://github.com/aws-samples/amazon-sagemaker-protein-classification/blob/main/code/train.py
+# key reference: 
+#               https://github.com/aws-samples/amazon-sagemaker-protein-classification/blob/main/code/train.py
+#               https://medium.com/analytics-vidhya/bert-pre-training-fine-tuning-eb574be614f6
 class ModelTrainer(nn.Module):
 
     """
@@ -115,7 +117,7 @@ class ModelTrainer(nn.Module):
 
                     input_ids = data['input_ids'].to(self.device)
                     input_mask = data['attention_mask'].to(self.device)
-                    labels = data['targets'].to(self.device)
+                    labels = data['interaction'].to(self.device)
 
                     outputs = model(input=input_ids, attention_mask=input_mask, classification=True)
 
@@ -137,7 +139,7 @@ class ModelTrainer(nn.Module):
                     
                     input_ids = data['input_ids'].to(self.device)
                     input_mask = data['attention_mask'].to(self.device)
-                    labels = data['targets'].to(self.device)
+                    labels = data['interaction'].to(self.device)
 
                     outputs = self.model(input=input_ids, attention_mask=input_mask, classification=True)
                     

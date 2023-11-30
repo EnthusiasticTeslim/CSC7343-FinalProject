@@ -5,9 +5,11 @@ Untitled-1*
 # IPython
 profile_default/
 ipython_config.py
+*src/__pycache__*
 
 #pyc
 *.pyc
+*.DS_Store
 
 # pyenv
 .python-version

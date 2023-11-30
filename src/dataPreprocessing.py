@@ -1,7 +1,7 @@
 
 import torch
 from torch.utils.data import Dataset
-
+# ref: https://medium.com/analytics-vidhya/bert-pre-training-fine-tuning-eb574be614f6
 class ProteinDataset(Dataset):
     """
     sequence: protein sequence containing antigen & TCR
