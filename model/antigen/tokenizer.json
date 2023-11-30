@@ -2,53 +2,7 @@
   "version": "1.0",
   "truncation": null,
   "padding": null,
-  "added_tokens": [
-    {
-      "id": 0,
-      "content": "[PAD]",
-      "single_word": false,
-      "lstrip": false,
-      "rstrip": false,
-      "normalized": false,
-      "special": true
-    },
-    {
-      "id": 1,
-      "content": "[CLS]",
-      "single_word": false,
-      "lstrip": false,
-      "rstrip": false,
-      "normalized": false,
-      "special": true
-    },
-    {
-      "id": 2,
-      "content": "[SEP]",
-      "single_word": false,
-      "lstrip": false,
-      "rstrip": false,
-      "normalized": false,
-      "special": true
-    },
-    {
-      "id": 3,
-      "content": "[MASK]",
-      "single_word": false,
-      "lstrip": false,
-      "rstrip": false,
-      "normalized": false,
-      "special": true
-    },
-    {
-      "id": 4,
-      "content": "[UNK]",
-      "single_word": false,
-      "lstrip": false,
-      "rstrip": false,
-      "normalized": false,
-      "special": true
-    }
-  ],
+  "added_tokens": [],
   "normalizer": {
     "type": "BertNormalizer",
     "clean_text": true,
@@ -150,26 +104,26 @@
       "[SEP]": 2,
       "[MASK]": 3,
       "[UNK]": 4,
-      "M": 5,
-      "C": 6,
-      "L": 7,
-      "R": 8,
+      "L": 5,
+      "S": 6,
+      "W": 7,
+      "K": 8,
       "I": 9,
       "Q": 10,
-      "P": 11,
-      "E": 12,
-      "A": 13,
-      "S": 14,
-      "W": 15,
-      "T": 16,
-      "G": 17,
-      "N": 18,
-      "K": 19,
-      "D": 20,
-      "V": 21,
-      "H": 22,
-      "Y": 23,
-      "F": 24
+      "F": 11,
+      "A": 12,
+      "Y": 13,
+      "T": 14,
+      "C": 15,
+      "V": 16,
+      "P": 17,
+      "D": 18,
+      "R": 19,
+      "N": 20,
+      "E": 21,
+      "M": 22,
+      "G": 23,
+      "H": 24
     }
   }
 }
