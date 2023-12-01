@@ -1,29 +1,34 @@
 # import libraries
+import torch
+import torch.nn as nn
+
+import random, datasets, evaluate
 import numpy as np
 import pandas as pd
-import torch
+import os
+
+from transformers import AutoTokenizer, AutoConfig, AutoModelForMaskedLM, DataCollatorForLanguageModeling, Trainer,  TrainingArguments
+from transformers import BertModel, BertConfig
+
 from classifier import ModelTrainer
 from dataPreprocessing import ProteinDataset # dataset preprocessor
+from model import BERT_CONFIG
 
-from transformers import BertTokenizer
-
+os.chdir('../')
 ## the data
-data = pd.read_csv('../data/data.csv') # antigen, TCR, interaction
+data = pd.read_csv('./data/data.csv') # antigen, TCR, interaction
+data['antigen'] = data['antigen'].apply(lambda x: ' '.join(list(x)))
+data['TCR'] = data['TCR'].apply(lambda x: ' '.join(list(x)))
+
 ANTIGEN = np.asarray(data.antigen, dtype='str')
 TCR = np.asarray(data.TCR, dtype='str')
 interaction = np.asarray(data.interaction, dtype="int")
+print("data successfully loaded.")
 
-## tokenizer
-MAX_LEN = 512  # this is the max length of the sequence
-BASE_MODEL_NAME = 'bert-base-uncased'
-tokenizer = BertTokenizer.from_pretrained(BASE_MODEL_NAME, do_lower_case=False)
-
-## create tokens
-# Adding CLS (<cls>) and SEP(<sep>) to return "<cls>{antigen}<sep>{tcr}"
-sequence = ["<cls> " + ant + " <sep> " + tcr for antigen, tcr in zip(ANTIGEN, TCR)]
-
-
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+## TOKENIZER
+tokenizer_name = "models/antigen"
+tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, config=BERT_CONFIG)
+tokenizer.model_max_length = 64
 print("Tokenizer downloaded successfully.")
 
 tokenized_texts = [tokenizer.tokenize(sent) for sent in sentences]
