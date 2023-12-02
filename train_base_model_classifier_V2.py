@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 from transformers import AutoTokenizer
 
 from src.model import BERT_CONFIG
-#from src.classifier import ModelTrainer
 from src.classifier_V2 import ModelTrainer
 
 start_time = time.time()
@@ -57,7 +56,6 @@ test_loader = torch.utils.data.DataLoader(tokenized_datasets['test'], batch_size
 # model
 epoch=10
 Model = ModelTrainer(epochs=epoch, lr=1e-3)
-#Model.train(train_loader=train_loader, test_loader=test_loader, batch_size=batch_size, fold=3)
 Model.execute_run(train_loader=train_loader, test_loader=test_loader, batch_size=batch_size, fold=3)
 
 Model.save(f'./model/base_model_sum_balanced_epoch{epoch}_classified_V2')

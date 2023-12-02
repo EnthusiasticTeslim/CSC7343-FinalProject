@@ -8,7 +8,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 
 from src.model import clf_loss_func, TCRModel # model, loss function
 
@@ -108,9 +108,9 @@ class ModelTrainer(nn.Module):
         
         # split data for K-fold cross validation to avoid overfitting
         indices = list(range(len(train_loader.dataset)))
-        kf = KFold(n_splits=fold, shuffle=True)
+        skf = StratifiedKFold(n_splits=fold, shuffle=True)
 
-        for cv_index, (train_indices, valid_indices) in enumerate(kf.split(indices)):
+        for cv_index, (train_indices, valid_indices) in enumerate(skf.split(indices)):
 
             train_sampler = SubsetRandomSampler(train_indices)
             valid_sampler = SubsetRandomSampler(valid_indices)
