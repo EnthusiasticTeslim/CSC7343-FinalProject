@@ -18,7 +18,7 @@ To get started with the repository, follow these steps:
 4. If you're using machine learning models, the `models` folder is where you can save and load trained models.
 5. If you have any datasets or data resources, place them in the `data` folder.
 
-Feel free to contribute, open issues, or submit pull requests if you have any improvements or ideas to share. Happy molecule generation!
+Feel free to contribute, open issues, or submit pull requests if you have any improvements or ideas to share. Happy pretraining!
 
 ## License
 
