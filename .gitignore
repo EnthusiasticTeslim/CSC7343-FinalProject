@@ -27,3 +27,5 @@ dmypy.json
 *bin
 *pt
 *pth
+*trainBERT*
+*trainedBERT*
